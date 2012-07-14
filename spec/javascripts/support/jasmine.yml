@@ -11,8 +11,8 @@
 #   - dist/**/*.js
 #
 src_files:
-    - public/javascripts/underscore-min.js
-    - public/javascripts/backbone-min.js
+    - public/javascripts/underscore.js
+    - public/javascripts/backbone.js
     - public/javascripts/test-setup.js
     - public/javascripts/backbone-factory.js
     #- public/javascripts/**/*.js
