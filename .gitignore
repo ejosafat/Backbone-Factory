@@ -15,3 +15,4 @@ schema.rb
 .tags
 emails/*
 public/uploads/*
+.rvmrc
