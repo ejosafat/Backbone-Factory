@@ -1,6 +1,9 @@
 // Backbone Factory JS
 // https://github.com/SupportBee/Backbone-Factory
 
+"use strict"
+
+
 window.BackboneFactory = (function () {
 
   var _factories = {};
@@ -43,8 +46,8 @@ window.BackboneFactory = (function () {
       // The object creator
       this.factories[factory_name] = function(options){
         if(options === undefined) options = function(){return {}};
-        arguments =  _.extend({}, {id: BackboneFactory.next("_" + factory_name + "_id")}, defaults.call(), options.call());
-        return new klass(arguments);
+        var params =  _.extend({}, {id: BackboneFactory.next("_" + factory_name + "_id")}, defaults.call(), options.call());
+        return new klass(params);
       };
 
       // Lets define a sequence for id
@@ -60,18 +63,17 @@ window.BackboneFactory = (function () {
       return this.factories[factory_name].apply(null, [options]);        
     },
 
-    define_sequence: function(sequence_name, callback){
-      this.sequences[sequence_name] = {}
-      this.sequences[sequence_name]['counter'] = 0;
-      this.sequences[sequence_name]['callback'] = callback; 
+    define_sequence: function (sequenceName, sequenceStrategy) {
+      setSequence(sequenceName, sequenceStrategy)
     },
 
-    next: function(sequence_name){
-      if(this.sequences[sequence_name] === undefined){
-        throw "Sequence with name " + sequence_name + " does not exist";
+    next: function(sequenceName){
+      var sequence = getSequence(sequenceName)
+      if (sequence === undefined) {
+        throw "Sequence with name " + sequenceName + " does not exist"
       }
-      this.sequences[sequence_name]['counter'] += 1;
-      return this.sequences[sequence_name]['callback'].apply(null, [this.sequences[sequence_name]['counter']]); //= callback; 
+      sequence['counter'] += 1
+      return sequence['strategy'].call(null, sequence['counter']) 
     }
   }
   return BackboneFactory
