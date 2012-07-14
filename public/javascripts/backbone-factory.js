@@ -1,8 +1,32 @@
 // Backbone Factory JS
 // https://github.com/SupportBee/Backbone-Factory
 
-(function(){
-  window.BackboneFactory = {
+window.BackboneFactory = (function () {
+
+  var _factories = {};
+  var _sequences = {};
+
+  // PRIVATE API
+  // Getters and setters
+  function getFactory (factoryName) {
+    return _factories[factoryName]
+  }
+
+  function getSequence (sequenceName) {
+    return _sequences[sequenceName]
+  }
+
+  function setFactory (factoryName, creationStrategy) {
+    _factories[factoryName] = creationStrategy
+  }
+
+  function setSequence (sequenceName, sequenceStrategy) {
+    _sequences[sequenceName] = {}
+    _sequences[sequenceName]['counter'] = 0
+    _sequences[sequenceName]['strategy'] = sequenceStrategy
+  }
+
+  var BackboneFactory = {
 
     factories: {},
     sequences: {},
@@ -50,4 +74,5 @@
       return this.sequences[sequence_name]['callback'].apply(null, [this.sequences[sequence_name]['counter']]); //= callback; 
     }
   }
-})();
+  return BackboneFactory
+}())
