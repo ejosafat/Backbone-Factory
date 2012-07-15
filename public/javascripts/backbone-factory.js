@@ -30,13 +30,25 @@ window.BackboneFactory = (function () {
   }
 
   // Strategy of creation
-  function defaultStrategy (factoryName, klass, defaults, options) {
-      if (options === undefined) {
-        options = function () {return {}}
+  function defaultStrategy (factoryName, klass, defaultAttributes, defaultOptions, attributes, options) {
+      if (_.isFunction(defaultAttributes)) {
+        defaultAttributes = defaultAttributes.call(null)
       } 
-      var params =  _.extend({}, { id: BackboneFactory.next(idSequenceName(factoryName)) }, defaults.call(), options.call())
-      return new klass(params)
+      if (_.isFunction(defaultOptions)) {
+        defaultOptions = defaultOptions.call(null)
+      }
+      if (_.isFunction(attributes)) {
+        attributes = attributes.call(null)
+      }
+      if (_.isFunction(options)) {
+        options = options.call(null)
+      }
+
+      var attributesParams =  _.extend({}, { id: BackboneFactory.next(idSequenceName(factoryName)) }, defaultAttributes, attributes)
+      var optionsParams = _.extend({}, defaultOptions ,options)
+      return new klass(attributesParams, optionsParams)
   }
+
   function idSequenceName (factoryName) {
     return "_" + factoryName + "_id"
   }
@@ -45,17 +57,15 @@ window.BackboneFactory = (function () {
 
   var BackboneFactory = {}
 
-  BackboneFactory.define = function (factoryName, klass, defaults) {
+  BackboneFactory.define = function (factoryName, klass, defaultAttributes, defaultOptions) {
 
     // Check for arguments' sanity
     if(factoryName.match(/[^\w_]+/)){
       throw "Factory name should not contain spaces or other funky characters";
     }
 
-    if(defaults === undefined) defaults = function(){return {}}
-
     // The object creator
-    setFactory(factoryName, _.bind(defaultStrategy, null, factoryName, klass, defaults))
+    setFactory(factoryName, _.bind(defaultStrategy, null, factoryName, klass, defaultAttributes, defaultOptions))
 
     // Lets define a sequence for id
     BackboneFactory.define_sequence(idSequenceName(factoryName), function (n) {
@@ -63,12 +73,12 @@ window.BackboneFactory = (function () {
     })
   }
 
-  BackboneFactory.create = function (factoryName, options) {
+  BackboneFactory.create = function (factoryName, attributes, options) {
     var factory = getFactory(factoryName)
     if (factory === undefined) {
       throw "Factory with name " + factoryName + " does not exist"
     }
-    return factory.call(null, options)  
+    return factory.call(null, attributes, options)  
   }
 
   BackboneFactory.define_sequence = function (sequenceName, sequenceStrategy) {

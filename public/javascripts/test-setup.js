@@ -14,3 +14,7 @@ var Post = Backbone.Model.extend({
   }
 
 });
+
+var ObjectWithOptions = Backbone.Model.extend({
+
+})
