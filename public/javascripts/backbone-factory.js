@@ -29,52 +29,60 @@ window.BackboneFactory = (function () {
     _sequences[sequenceName]['strategy'] = sequenceStrategy
   }
 
-  var BackboneFactory = {
-
-    factories: {},
-    sequences: {},
-
-    define: function(factory_name, klass, defaults){
-
-      // Check for arguments' sanity
-      if(factory_name.match(/[^\w_]+/)){
-        throw "Factory name should not contain spaces or other funky characters";
-      }
-
-      if(defaults === undefined) defaults = function(){return {}};
-
-      // The object creator
-      this.factories[factory_name] = function(options){
-        if(options === undefined) options = function(){return {}};
-        var params =  _.extend({}, {id: BackboneFactory.next("_" + factory_name + "_id")}, defaults.call(), options.call());
-        return new klass(params);
-      };
-
-      // Lets define a sequence for id
-      BackboneFactory.define_sequence("_"+ factory_name +"_id", function(n){
-        return n
-      });
-    },
-
-    create: function(factory_name, options){
-      if(this.factories[factory_name] === undefined){
-        throw "Factory with name " + factory_name + " does not exist";
-      }
-      return this.factories[factory_name].apply(null, [options]);        
-    },
-
-    define_sequence: function (sequenceName, sequenceStrategy) {
-      setSequence(sequenceName, sequenceStrategy)
-    },
-
-    next: function(sequenceName){
-      var sequence = getSequence(sequenceName)
-      if (sequence === undefined) {
-        throw "Sequence with name " + sequenceName + " does not exist"
-      }
-      sequence['counter'] += 1
-      return sequence['strategy'].call(null, sequence['counter']) 
-    }
+  // Strategy of creation
+  function defaultStrategy (factoryName, klass, defaults, options) {
+      if (options === undefined) {
+        options = function () {return {}}
+      } 
+      var params =  _.extend({}, { id: BackboneFactory.next(idSequenceName(factoryName)) }, defaults.call(), options.call())
+      return new klass(params)
   }
+  function idSequenceName (factoryName) {
+    return "_" + factoryName + "_id"
+  }
+
+  // PUBLIC API
+
+  var BackboneFactory = {}
+
+  BackboneFactory.define = function (factoryName, klass, defaults) {
+
+    // Check for arguments' sanity
+    if(factoryName.match(/[^\w_]+/)){
+      throw "Factory name should not contain spaces or other funky characters";
+    }
+
+    if(defaults === undefined) defaults = function(){return {}}
+
+    // The object creator
+    setFactory(factoryName, _.bind(defaultStrategy, null, factoryName, klass, defaults))
+
+    // Lets define a sequence for id
+    BackboneFactory.define_sequence(idSequenceName(factoryName), function (n) {
+      return n
+    })
+  }
+
+  BackboneFactory.create = function (factoryName, options) {
+    var factory = getFactory(factoryName)
+    if (factory === undefined) {
+      throw "Factory with name " + factoryName + " does not exist"
+    }
+    return factory.call(null, options)  
+  }
+
+  BackboneFactory.define_sequence = function (sequenceName, sequenceStrategy) {
+    setSequence(sequenceName, sequenceStrategy)
+  }
+
+  BackboneFactory.next = function (sequenceName) {
+    var sequence = getSequence(sequenceName)
+    if (sequence === undefined) {
+      throw "Sequence with name " + sequenceName + " does not exist"
+    }
+    sequence['counter'] += 1
+    return sequence['strategy'].call(null, sequence['counter']) 
+  }
+
   return BackboneFactory
 }())
