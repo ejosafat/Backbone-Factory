@@ -35,9 +35,11 @@ var Post = Backbone.Model.extend({
   }
 
 })
+```
 
 and one Collection, Users
 
+```javascript
 var Users = Backbone.Collection.extend({
   model : User
 })
@@ -70,8 +72,8 @@ This will create objects using the [defaults](http://documentcloud.github.com/ba
 
 ```javascript
 var emailSequence = BackboneFactory.define_sequence('email', function (n) {
-        return "person" + n + "@example.com"
-      })
+  return "person" + n + "@example.com"
+})
 ```
 
 ### Using Sequences
@@ -84,18 +86,19 @@ var email = BackboneFactory.next('email') // person1@example.com
 
 ```javascript
 var userFactory = BackboneFactory.define('user', User, function(){
-                                   return {
-                                     name : 'Backbone User',
-                                     email : BackboneFactory.next('person_email')
-                                      }
-                                    }
-                                   )
-If you don't need to invoke any function (like BackboneFactory.next), you can use a simple literal instead of a function as defaults.
+  return {
+    name : 'Backbone User',
+    email : BackboneFactory.next('person_email')
+  }
+})
+```
 
+If you don't need to invoke any function (like BackboneFactory.next), you can use a simple literal instead of a function as defaults.
 To define a default collection, just pass an array of literals to the definition:
 
 ```javascript
 var usersFactory = BackboneFactory.define('user', User, [{ name : 'Joe', email : 'joe@example.com' }])
+```
 
 It's possible to define default options too:
 
@@ -103,6 +106,7 @@ It's possible to define default options too:
 var usersFactory = BackboneFactory.define('user', User, [{ name : 'Joe', email : 'joe@example.com' }], { comparator : function (user) {
   return user.get("name")
 }})
+```
 
 If you want to omit defaults and specify options, just pass a null or undefined parameter as:
 
@@ -110,7 +114,6 @@ If you want to omit defaults and specify options, just pass a null or undefined 
 var usersFactory = BackboneFactory.define('user', User, null, { comparator : function (user) {
   return user.get("name")
 }})
-
 ```
 
 ### Overriding defaults when creating objects
