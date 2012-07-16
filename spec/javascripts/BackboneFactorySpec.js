@@ -37,24 +37,24 @@ describe("Backbone Factory", function() {
     it("return an instance of the Backbone Object requested", function() {
       expect(this.postObject instanceof Post).toBeTruthy()
       expect(this.userObject instanceof User).toBeTruthy()
-    });
+    })
           
     // Not sure if this test is needed. But what the hell!
     it("should preserve the defaults if not overriden", function() {
       expect(this.postObject.get('title')).toBe('Default Title')
-    });
+    })
 
     
 
     it("should use the defaults supplied when creating objects", function() {
       expect(this.userObject.get('name')).toBe('Backbone User')
-    });
+    })
 
     xit("should work with sequences", function(){
       expect(this.userObject.get('email')).toBe('person2@example.com')
       var anotherUser = BackboneFactory.create('user')
       expect(anotherUser.get('email')).toBe('person3@example.com')
-    });
+    })
 
     it("should work if other factories are passed", function(){
       expect(this.postObject.get('author') instanceof User).toBeTruthy()
@@ -63,11 +63,11 @@ describe("Backbone Factory", function() {
     it("should override defaults if arguments are passed on creation", function(){
       var userWithEmail = BackboneFactory.create('user', { email: 'overriden@example.com' })
       expect(userWithEmail.get('email')).toBe('overriden@example.com')
-    });
+    })
 
     it("should have an id", function() {
       expect(this.userObject.id).toBeDefined()
-    });
+    })
 
     it("should have an id that increments on creation", function(){
       var firstID = BackboneFactory.create('user').id
@@ -89,9 +89,9 @@ describe("Backbone Factory", function() {
         expect(function(){BackboneFactory.next('undefined_sequence')}).toThrow("Sequence with name undefined_sequence does not exist");
       })
       
-    });  
+    })
     
-  });  
+  }) 
   
   describe("Adding options to Backbone initializers", function() {
     it("could be omitted", function() {
@@ -110,7 +110,15 @@ describe("Backbone Factory", function() {
       BackboneFactory.define("with_options", ObjectWithOptions, undefined, { collection : myCollection })
       var myObject = BackboneFactory.create("with_options")
       expect(myObject.collection).toBe(myCollection)
-    });
+    })
+    it("should override default options", function() {
+      var defaultCollection = []
+      var myCollection = []
+      BackboneFactory.define("with_options", ObjectWithOptions, undefined, { collection : defaultCollection })
+      var myObject = BackboneFactory.create("with_options", undefined, { collection : myCollection })
+      expect(myObject.collection).not.toBe(defaultCollection)
+      expect(myObject.collection).toBe(myCollection)
+    })
   })
 })       
 
