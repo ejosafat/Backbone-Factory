@@ -29,7 +29,7 @@ window.BackboneFactory = (function () {
     _sequences[sequenceName]['strategy'] = sequenceStrategy
   }
 
-  // Strategy of creation
+  // Strategies of creation
   function defaultStrategy (factoryName, klass, defaultAttributes, defaultOptions, attributes, options) {
       if (_.isFunction(defaultAttributes)) {
         defaultAttributes = defaultAttributes.call(null)
@@ -49,6 +49,25 @@ window.BackboneFactory = (function () {
       return new klass(attributesParams, optionsParams)
   }
 
+  function collectionStrategy (factoryName, klass, defaultModels, defaultOptions, models, options) {
+    if (_.isFunction(defaultModels)) {
+        defaultModels = defaultModels.call(null)
+      } 
+      if (_.isFunction(defaultOptions)) {
+        defaultOptions = defaultOptions.call(null)
+      }
+      if (_.isFunction(models)) {
+        models = models.call(null)
+      }
+      if (_.isFunction(options)) {
+        options = options.call(null)
+      }
+
+      var modelsParam = models || defaultModels || null
+      var optionsParams = _.extend({}, defaultOptions ,options)
+      return new klass(modelsParam, optionsParams)
+  }
+
   function idSequenceName (factoryName) {
     return "_" + factoryName + "_id"
   }
@@ -64,13 +83,17 @@ window.BackboneFactory = (function () {
       throw "Factory name should not contain spaces or other funky characters";
     }
 
-    // The object creator
-    setFactory(factoryName, _.bind(defaultStrategy, null, factoryName, klass, defaultAttributes, defaultOptions))
-
-    // Lets define a sequence for id
-    BackboneFactory.define_sequence(idSequenceName(factoryName), function (n) {
-      return n
-    })
+    if (_.isUndefined(klass.prototype.reset)) {
+      // Backbone model
+      // Lets define a sequence for id
+      BackboneFactory.define_sequence(idSequenceName(factoryName), function (n) {
+        return n
+      })
+      // The object creator
+      setFactory(factoryName, _.bind(defaultStrategy, null, factoryName, klass, defaultAttributes, defaultOptions))
+    } else {
+      setFactory(factoryName, _.bind(collectionStrategy, null, factoryName, klass, defaultAttributes, defaultOptions))
+    }  
   }
 
   BackboneFactory.create = function (factoryName, attributes, options) {

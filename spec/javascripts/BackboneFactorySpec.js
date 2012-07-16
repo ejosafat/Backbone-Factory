@@ -120,5 +120,55 @@ describe("Backbone Factory", function() {
       expect(myObject.collection).toBe(myCollection)
     })
   })
+
+  describe("Backbone Collection Factories", function() {
+    it("should allow to be defined without any defaults nor options", function() {
+      BackboneFactory.define("myCollection", Collection)
+      var myObjects = BackboneFactory.create("myCollection")
+      expect(myObjects).toBeInstanceOf(Collection)
+    })
+    it("should allow to define a default collection", function() {
+      BackboneFactory.define("myCollection", Collection, [{ id : 1, name : "test1" }, { id : 2, name : "test2" }])
+      var myObjects = BackboneFactory.create("myCollection")
+      expect(myObjects).toBeInstanceOf(Collection)
+      expect(myObjects.length).toEqual(2)
+    })
+    it("should allow to define default options", function() {
+      BackboneFactory.define("myCollection", Collection, [{ id : 1, name : "test1" }, { id : 2, name : "test2" }], { model : User })
+      var myObjects = BackboneFactory.create("myCollection")
+      expect(myObjects).toBeInstanceOf(Collection)
+      expect(myObjects.length).toEqual(2)
+      expect(myObjects.model).toEqual(User)
+      myObjects.each(function (user) {
+        expect(user).toBeInstanceOf(User)
+      })
+      expect(myObjects.get(1).get("name")).toEqual("test1")
+    })
+    it("should allow to override default collection", function() {
+      BackboneFactory.define("myCollection", Collection, [{ id : 1, name : "test1" }, { id : 2, name : "test2" }], { model : User })
+      var myObjects = BackboneFactory.create("myCollection", [{ id : 3, name : "test3" }])
+      expect(myObjects).toBeInstanceOf(Collection)
+      expect(myObjects.length).toEqual(1)
+      expect(myObjects.model).toEqual(User)
+      myObjects.each(function (user) {
+        expect(user).toBeInstanceOf(User)
+      })
+      expect(myObjects.get(1)).toBeUndefined()
+      expect(myObjects.get(3).get("name")).toEqual("test3")
+    })
+    it("should allow to override default options", function() {
+      defaultComparator = function (object) {
+        return object
+      }
+      newComparator = function (object) {
+        return 3
+      }
+      BackboneFactory.define("myCollection", Collection, [{ id : 1, name : "test1" }, { id : 2, name : "test2" }], { model : User, comparator : defaultComparator })
+      var myObjects = BackboneFactory.create("myCollection", undefined, { comparator : newComparator })
+      expect(myObjects).toBeInstanceOf(Collection)
+      expect(myObjects.length).toEqual(2)
+      expect(myObjects.comparator).toEqual(newComparator)
+    })
+  });
 })       
 
