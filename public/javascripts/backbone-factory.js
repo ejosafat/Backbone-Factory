@@ -1,4 +1,6 @@
 // Backbone Factory JS
+// https://github.com/ejosafat/Backbone-Factory
+// You can find the origina repo at:
 // https://github.com/SupportBee/Backbone-Factory
 
 "use strict"

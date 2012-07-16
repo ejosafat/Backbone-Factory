@@ -6,13 +6,15 @@ Introduction
 
 Backbone Factory is a small javascript library for creating [Backbone.js](http://documentcloud.github.com/backbone/) objects for testing your code. It has no external dependency. 
 
-The API is heavily inspired by the awesome [Factory Girl](https://github.com/thoughtbot/factory_girl). 
+The API is heavily inspired by the awesome [Factory Girl](https://github.com/thoughtbot/factory_girl).
+
+This is a fork. You may want to browse [the original repo](https://github.com/SupportBee/Backbone-Factory).
 
 
 Installation
 ------------
 
-To use it, just [download](https://github.com/SupportBee/Backbone-Factory/raw/master/public/javascripts/backbone-factory.js) the file and include it in your testing setup.  
+To use it, just [download](https://github.com/ejosafat/Backbone-Factory/raw/master/public/javascripts/backbone-factory.js) the file and include it in your testing setup.  
 Usage
 -----
 
@@ -21,18 +23,24 @@ Lets say you have two Backbone models, Post and User
 ```javascript
 var User = Backbone.Model.extend({
 
-  name: null,
-  email: null
+  name : null,
+  email : null
 
-});
+})
 
 var Post = Backbone.Model.extend({
 
   defaults: {
-    title: 'Default Title'
+    title : 'Default Title'
   }
 
-});
+})
+
+and one Collection, Users
+
+var Users = Backbone.Collection.extend({
+  model : User
+})
 ```
 
 ### Defining Factories
@@ -40,17 +48,19 @@ var Post = Backbone.Model.extend({
 To define factories for them
 
 ```javascript
-var postFactory = BackboneFactory.define('post', Post);
-var userFactory = BackboneFactory.define('user', User);
+var postFactory = BackboneFactory.define('post', Post)
+var userFactory = BackboneFactory.define('user', User)
+var usersFactory = BackboneFactory.define('users', Users)
 ```
 
 ### Using Factories
 
 To use these factories, 
 
-```javscript
-this.postObject = BackboneFactory.create('post');
-this.userObject = BackboneFactory.create('user');
+```javascript
+postObject = BackboneFactory.create('post')
+userObject = BackboneFactory.create('user')
+usersCollection = BackboneFactory.create('users')
 ```
 
 This will create objects using the [defaults](http://documentcloud.github.com/backbone/#Model-defaults) you have in your class definitions.
@@ -59,9 +69,9 @@ This will create objects using the [defaults](http://documentcloud.github.com/ba
 ### Defining Sequences 
 
 ```javascript
-var emailSequence = BackboneFactory.define_sequence('email', function(n){
-        return "person"+n+"@example.com"; 
-      });
+var emailSequence = BackboneFactory.define_sequence('email', function (n) {
+        return "person" + n + "@example.com"
+      })
 ```
 
 ### Using Sequences
@@ -76,20 +86,37 @@ var email = BackboneFactory.next('email') // person1@example.com
 var userFactory = BackboneFactory.define('user', User, function(){
                                    return {
                                      name : 'Backbone User',
-                                     email: BackboneFactory.next('person_email')
-                                      };
+                                     email : BackboneFactory.next('person_email')
+                                      }
                                     }
-                                   );
+                                   )
+If you don't need to invoke any function (like BackboneFactory.next), you can use a simple literal instead of a function as defaults.
+
+To define a default collection, just pass an array of literals to the definition:
+
+```javascript
+var usersFactory = BackboneFactory.define('user', User, [{ name : 'Joe', email : 'joe@example.com' }])
+
+It's possible to define default options too:
+
+```javascript
+var usersFactory = BackboneFactory.define('user', User, [{ name : 'Joe', email : 'joe@example.com' }], { comparator : function (user) {
+  return user.get("name")
+}})
+
+If you want to omit defaults and specify options, just pass a null or undefined parameter as:
+
+```javascript
+var usersFactory = BackboneFactory.define('user', User, null, { comparator : function (user) {
+  return user.get("name")
+}})
+
 ```
 
 ### Overriding defaults when creating objects
 
 ```javascript
-var userWithEmail = BackboneFactory.create('user', function(){
-                                             return {
-                                                email: 'overriden@example.com'
-                                              };
-                            });
+var userWithEmail = BackboneFactory.create('user', { email: 'overriden@example.com' }, { collection : users }})
  ```
 
 Contributing
