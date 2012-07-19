@@ -185,6 +185,11 @@ describe("Backbone Factory", function() {
       var userList = BackboneFactory.createList("user", 30)
       expect(userList.length).toEqual(30)
     })
+    it("should allow to define default list size", function() {
+      BackboneFactory.setDefaultListSize(20)
+      var userList = BackboneFactory.createList("user")
+      expect(userList.length).toEqual(20)
+    })
   })
 })       
 

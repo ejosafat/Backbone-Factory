@@ -69,6 +69,7 @@ window.BackboneFactory = (function () {
 
   var BackboneFactory = {}
 
+  // Lists
   BackboneFactory.createList = function (factoryName, size) {
     var list = []
     size = size || DEFAULT_LIST_SIZE
@@ -77,7 +78,15 @@ window.BackboneFactory = (function () {
     }
     return list
   }
+  
+  BackboneFactory.setDefaultListSize = function (size) {
+    if (_.isNumber(size) && size > 0) {
+      DEFAULT_LIST_SIZE = size
+    }
+  }
 
+
+  // Factories
   BackboneFactory.define = function (factoryName, klass, defaultAttributes, defaultOptions) {
 
     // Check for arguments' sanity
@@ -115,6 +124,8 @@ window.BackboneFactory = (function () {
     return factory.call(null, runtimeOptions)  
   }
 
+
+  // Sequences
   BackboneFactory.define_sequence = function (sequenceName, sequenceStrategy) {
     setSequence(sequenceName, sequenceStrategy)
   }
