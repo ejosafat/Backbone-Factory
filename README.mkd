@@ -122,6 +122,22 @@ var usersFactory = BackboneFactory.define('user', User, null, { comparator : fun
 var userWithEmail = BackboneFactory.create('user', { email: 'overriden@example.com' }, { collection : users }})
  ```
 
+ ### Create lists (arrays) of models
+ 
+```javascript
+var userList = BackboneFactory.createList("user", 30)  // generates an array of 30 User models.
+BackboneFactory.create("users", userList) // creates a collection factory initialized with the list
+BackboneFactory.define("users", Users, userList) // factory definition with default initialization with the list
+```
+
+You can omit the size; it will be 10 by default, but you can change this:
+
+```javascript
+var userList = BackboneFactory.createList("user") // userList.length = 10
+BackboneFactory.setDefaultListSize(20)
+var biggerList = BackboneFactory.createList("user") // userList.length = 20
+```
+
 Contributing
 ------------
 
