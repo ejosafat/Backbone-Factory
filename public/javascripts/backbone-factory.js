@@ -11,6 +11,8 @@ window.BackboneFactory = (function () {
   var _factories = {};
   var _sequences = {};
 
+  var DEFAULT_LIST_SIZE = 10
+
   // PRIVATE API
   // Getters and setters
   function getFactory (factoryName) {
@@ -77,6 +79,15 @@ window.BackboneFactory = (function () {
   // PUBLIC API
 
   var BackboneFactory = {}
+
+  BackboneFactory.createList = function (factoryName, size) {
+    var list = []
+    size = size || DEFAULT_LIST_SIZE
+    for (var i = 0; i < size; i++) {
+      list.push(BackboneFactory.create(factoryName))
+    }
+    return list
+  }
 
   BackboneFactory.define = function (factoryName, klass, defaultAttributes, defaultOptions) {
 

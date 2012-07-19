@@ -169,6 +169,21 @@ describe("Backbone Factory", function() {
       expect(myObjects.length).toEqual(2)
       expect(myObjects.comparator).toEqual(newComparator)
     })
-  });
+  })
+
+  describe("creating lists of models", function() {
+    it("should build an array with 10 (default) models", function() {
+      var userList = BackboneFactory.createList("user")
+      expect(userList).toBeInstanceOf(Array)
+      expect(userList.length).toEqual(10)
+      _(userList).all(function (user) {
+        expect(user).toBeInstanceOf(User)
+      })
+    })
+    it("should build an array with the specified amount of models", function() {
+      var userList = BackboneFactory.createList("user", 30)
+      expect(userList.length).toEqual(30)
+    })
+  })
 })       
 
