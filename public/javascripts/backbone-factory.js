@@ -33,48 +33,37 @@ window.BackboneFactory = (function () {
     _sequences[sequenceName]['strategy'] = sequenceStrategy
   }
 
-  // Strategies of creation
-  function defaultStrategy (factoryName, klass, defaultAttributes, defaultOptions, attributes, options) {
-      if (_.isFunction(defaultAttributes)) {
-        defaultAttributes = defaultAttributes.call(null)
-      } 
-      if (_.isFunction(defaultOptions)) {
-        defaultOptions = defaultOptions.call(null)
-      }
-      if (_.isFunction(attributes)) {
-        attributes = attributes.call(null)
-      }
-      if (_.isFunction(options)) {
-        options = options.call(null)
-      }
-
-      var attributesParams =  _.extend({}, { id: BackboneFactory.next(idSequenceName(factoryName)) }, defaultAttributes, attributes)
-      var optionsParams = _.extend({}, defaultOptions ,options)
-      return new klass(attributesParams, optionsParams)
-  }
-
-  function collectionStrategy (factoryName, klass, defaultModels, defaultOptions, models, options) {
-    if (_.isFunction(defaultModels)) {
-        defaultModels = defaultModels.call(null)
-      } 
-      if (_.isFunction(defaultOptions)) {
-        defaultOptions = defaultOptions.call(null)
-      }
-      if (_.isFunction(models)) {
-        models = models.call(null)
-      }
-      if (_.isFunction(options)) {
-        options = options.call(null)
-      }
-
-      var modelsParam = models || defaultModels || null
-      var optionsParams = _.extend({}, defaultOptions ,options)
-      return new klass(modelsParam, optionsParams)
-  }
-
+  // Strategies of creation and auxiliary methods
   function idSequenceName (factoryName) {
     return "_" + factoryName + "_id"
   }
+
+  function normalizedParams (params) {
+    _(params).each(function (paramValue, paramName) {
+      if (_.isFunction(paramValue)) {
+        params[paramName] = paramValue.call(null)
+      }
+    })
+    return params
+  }
+
+  function defaultStrategy (factoryName, klass, defaults, runtimeOptions) {
+      var params = normalizedParams(_.extend({}, defaults, runtimeOptions))
+
+      var attributesParams =  _.extend({}, { id: BackboneFactory.next(idSequenceName(factoryName)) }, params.defaultAttributes, params.attributes)
+      var optionsParams = _.extend({}, params.defaultOptions, params.options)
+      return new klass(attributesParams, optionsParams)
+  }
+
+  function collectionStrategy (factoryName, klass, defaults, runtimeOptions) {
+      var params = normalizedParams(_.extend({}, defaults, runtimeOptions))
+
+      var modelsParam = params.attributes || params.defaultAttributes || null
+      var optionsParams = _.extend({}, params.defaultOptions, params.options)
+      return new klass(modelsParam, optionsParams)
+  }
+
+  
 
   // PUBLIC API
 
@@ -96,6 +85,11 @@ window.BackboneFactory = (function () {
       throw "Factory name should not contain spaces or other funky characters";
     }
 
+    var defaults = {
+      defaultAttributes : defaultAttributes,
+      defaultOptions : defaultOptions
+    }
+
     if (_.isUndefined(klass.prototype.reset)) {
       // Backbone model
       // Lets define a sequence for id
@@ -103,9 +97,9 @@ window.BackboneFactory = (function () {
         return n
       })
       // The object creator
-      setFactory(factoryName, _.bind(defaultStrategy, null, factoryName, klass, defaultAttributes, defaultOptions))
+      setFactory(factoryName, _.bind(defaultStrategy, null, factoryName, klass, defaults))
     } else {
-      setFactory(factoryName, _.bind(collectionStrategy, null, factoryName, klass, defaultAttributes, defaultOptions))
+      setFactory(factoryName, _.bind(collectionStrategy, null, factoryName, klass, defaults))
     }  
   }
 
@@ -114,7 +108,11 @@ window.BackboneFactory = (function () {
     if (factory === undefined) {
       throw "Factory with name " + factoryName + " does not exist"
     }
-    return factory.call(null, attributes, options)  
+    var runtimeOptions = {
+      attributes : attributes,
+      options : options
+    }
+    return factory.call(null, runtimeOptions)  
   }
 
   BackboneFactory.define_sequence = function (sequenceName, sequenceStrategy) {

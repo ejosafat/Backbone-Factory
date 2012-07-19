@@ -128,6 +128,7 @@ describe("Backbone Factory", function() {
       expect(myObjects).toBeInstanceOf(Collection)
     })
     it("should allow to define a default collection", function() {
+      //debugger
       BackboneFactory.define("myCollection", Collection, [{ id : 1, name : "test1" }, { id : 2, name : "test2" }])
       var myObjects = BackboneFactory.create("myCollection")
       expect(myObjects).toBeInstanceOf(Collection)
