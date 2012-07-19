@@ -122,7 +122,7 @@ var usersFactory = BackboneFactory.define('user', User, null, { comparator : fun
 var userWithEmail = BackboneFactory.create('user', { email: 'overriden@example.com' }, { collection : users }})
  ```
 
- ### Create lists (arrays) of models
+### Create lists (arrays) of models
  
 ```javascript
 var userList = BackboneFactory.createList("user", 30)  // generates an array of 30 User models.
